@@ -1,9 +1,2 @@
-[build]
-builder = "nixpacks"
-
-[build.nixpacks]
-# Only include the backend directory in the build
-rootDir = "backend"
-
 [deploy]
-startCommand = "python main.py"
+startCommand = "cd backend && python main.py"
