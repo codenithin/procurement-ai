@@ -2,7 +2,7 @@
 nixPackages = ["python311"]
 
 [start]
-cmd = "cd backend && python main.py"
+cmd = "cd backend/app && python main.py"
 
 [build.nixpacks]
 rootDir = "backend"
