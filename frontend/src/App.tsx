@@ -345,14 +345,121 @@ interface LeakageFinding {
 }
 
 // Main App
+// Password Gate Component
+const PasswordGate = ({ onAuthenticate }: { onAuthenticate: () => void }) => {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    // Check password
+    setTimeout(() => {
+      if (password === 'Flipkartprocurement') {
+        localStorage.setItem('procurement_auth', 'true');
+        onAuthenticate();
+      } else {
+        setError('Invalid password. Please try again.');
+        setIsLoading(false);
+      }
+    }, 500);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#f1f3f6] flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+        {/* Header */}
+        <div className="bg-[#2874f0] p-6">
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="text-2xl font-medium text-white italic">Flipkart</h1>
+            <span className="text-sm text-[#ffe500] font-medium">PROCUREMENT</span>
+          </div>
+          <p className="text-center text-blue-200 mt-2">AI-Powered Procurement Platform</p>
+        </div>
+        {/* Yellow accent bar */}
+        <div className="h-1 bg-gradient-to-r from-[#ffe500] to-[#ff9f00]"></div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-8">
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-[#e8f0fe] rounded-full flex items-center justify-center">
+              <Shield size={32} className="text-[#2874f0]" />
+            </div>
+          </div>
+
+          <h2 className="text-xl font-medium text-[#212121] text-center mb-2">Protected Access</h2>
+          <p className="text-sm text-[#878787] text-center mb-6">Enter the password to access the platform</p>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-[#212121] mb-2">Password</label>
+            <div className="relative">
+              <Key size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#878787]" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-[#e0e0e0] rounded-sm focus:outline-none focus:border-[#2874f0] focus:ring-1 focus:ring-[#2874f0] text-[#212121]"
+                placeholder="Enter password"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-sm flex items-center gap-2">
+              <AlertCircle size={16} className="text-red-500" />
+              <span className="text-sm text-red-600">{error}</span>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading || !password}
+            className="w-full py-3 bg-[#ff9f00] hover:bg-[#e68f00] disabled:bg-[#e0e0e0] disabled:cursor-not-allowed text-white font-medium rounded-sm transition-colors flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <RefreshCw size={18} className="animate-spin" />
+                Verifying...
+              </>
+            ) : (
+              <>
+                <Shield size={18} />
+                Access Platform
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="px-8 pb-6">
+          <p className="text-xs text-[#878787] text-center">
+            This platform contains confidential procurement data. Unauthorized access is prohibited.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState<any>(null);
   const [, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('procurement_auth') === 'true';
+  });
 
   useEffect(() => {
     fetchStats();
   }, []);
+
+  // If not authenticated, show password gate
+  if (!isAuthenticated) {
+    return <PasswordGate onAuthenticate={() => setIsAuthenticated(true)} />;
+  }
 
   const fetchStats = async () => {
     try {
