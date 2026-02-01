@@ -191,3 +191,4 @@ The system includes comprehensive mock data:
 - Recharts for visualizations
 - Lucide React icons
 - Vite build tool
+
