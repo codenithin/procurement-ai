@@ -1,0 +1,5 @@
+[build]
+nixPackages = ["python311"]
+
+[start]
+cmd = "cd backend && python main.py"
