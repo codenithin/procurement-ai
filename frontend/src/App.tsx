@@ -452,15 +452,6 @@ function App() {
     return localStorage.getItem('procurement_auth') === 'true';
   });
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  // If not authenticated, show password gate
-  if (!isAuthenticated) {
-    return <PasswordGate onAuthenticate={() => setIsAuthenticated(true)} />;
-  }
-
   const fetchStats = async () => {
     try {
       const res = await fetch(`${API_BASE}/stats`);
@@ -481,6 +472,15 @@ function App() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  // If not authenticated, show password gate
+  if (!isAuthenticated) {
+    return <PasswordGate onAuthenticate={() => setIsAuthenticated(true)} />;
+  }
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
