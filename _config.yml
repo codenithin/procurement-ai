@@ -1,0 +1,9 @@
+exclude:
+  - backend
+  - venv
+  - node_modules
+  - __pycache__
+  - ".pytest_cache"
+  - ".venv"
+  - env
+  - "*.pyc"
