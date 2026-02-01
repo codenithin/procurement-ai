@@ -1,0 +1,7 @@
+backend/
+*.py
+requirements.txt
+railway.toml
+__pycache__/
+venv/
+.pytest_cache/

@@ -1,10 +1,6 @@
 {
+    "installCommand": "cd frontend && npm install",
     "buildCommand": "cd frontend && npm run build",
     "outputDirectory": "frontend/dist",
-    "framework": "vite",
-    "build": {
-        "env": {
-            "VITE_API_URL": "procurement-ai-production.up.railway.app"
-        }
-    }
+    "framework": "vite"
 }
