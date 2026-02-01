@@ -246,7 +246,7 @@ export default function BottleneckFlowChart() {
                   onClick={() => setSelectedNode(selectedNode?.id === node.id ? null : node)}
                 >
                   <div className={`relative flex flex-col items-center`}>
-                    {/* Node circles */}
+                    {/* Node circle */}
                     <div className={`w-16 h-16 rounded-full ${colors.bg} ${colors.ring} ring-4 flex items-center justify-center shadow-lg`}>
                       <div className="text-center">
                         <div className="text-white text-xs font-bold">{node.transactions}</div>
