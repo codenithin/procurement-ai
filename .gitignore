@@ -1,6 +1,13 @@
 # Dependencies
 node_modules/
 
+# Backend
+backend/venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
 # Build output
 dist/
 build/
