@@ -4,7 +4,7 @@
     "framework": "vite",
     "build": {
         "env": {
-            "VITE_API_URL": ""
+            "VITE_API_URL": "procurement-ai-production.up.railway.app"
         }
     }
 }
