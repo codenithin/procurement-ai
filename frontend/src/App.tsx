@@ -872,7 +872,7 @@ function DashboardView({ stats, setActiveTab }: { stats: any; setActiveTab: (tab
           <div className="grid grid-cols-5 gap-0">
             {/* Map */}
             <div className="col-span-3 p-4">
-              <div className="h-[380px]">
+              <div className="h-[520px]">
                 <IndiaMap
                   stateRisks={stateRiskData}
                   selectedState={selectedState}
