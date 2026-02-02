@@ -1928,7 +1928,7 @@ Would you like me to set up any specific evaluation criteria or add more vendors
 **Delivery Location:** ${requirements.location || 'Not specified'}
 
 **Items Extracted:**
-${requirements.items.slice(0, 5).map((item: any, i: number) => `• ${item.quantity} ${item.unit}`).join('\n') || '• Multiple items detected'}
+${requirements.items.slice(0, 5).map((item: any) => `• ${item.quantity} ${item.unit}`).join('\n') || '• Multiple items detected'}
 
 ---
 
