@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import GanttTimeline from './components/GanttTimeline';
 import BottleneckFlowChart from './components/BottleneckFlowChart';
-import ControlLapsDetection from './components/ControlLapsDetection';
+import ControlGapsDetection from './components/ControlGapsDetection';
 import SystemIntegrationMap from './components/SystemIntegrationMap';
 import ProcessDiscovery from './components/ProcessDiscovery';
 import VariantAnalysis from './components/VariantAnalysis';
@@ -1546,7 +1546,7 @@ function LifecycleView() {
                 viewMode === 'controls' ? 'bg-white shadow text-red-600 font-medium' : 'text-gray-600'
               }`}
             >
-              Control Laps
+              Control Gaps
             </button>
             <button
               onClick={() => setViewMode('integration')}
@@ -1616,7 +1616,7 @@ function LifecycleView() {
       {viewMode === 'bottleneck' ? (
         <BottleneckFlowChart />
       ) : viewMode === 'controls' ? (
-        <ControlLapsDetection />
+        <ControlGapsDetection />
       ) : viewMode === 'integration' ? (
         <SystemIntegrationMap />
       ) : viewMode === 'discovery' ? (
@@ -9085,7 +9085,7 @@ function DocumentationView() {
         highlights: [
           'Gantt chart timeline visualization of procurement stages',
           'Bottleneck detection and flow analysis',
-          'Control lapse identification',
+          'Control gaps identification',
           'Process variant analysis',
           'System integration mapping',
         ],
@@ -9099,7 +9099,7 @@ function DocumentationView() {
             description: 'Identify process bottlenecks and delays in the procurement workflow'
           },
           {
-            name: 'Control Laps Detection',
+            name: 'Control Gaps Detection',
             description: 'Automated detection of control failures and compliance gaps'
           },
           {

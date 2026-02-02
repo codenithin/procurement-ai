@@ -235,7 +235,7 @@ const getRiskScoreColor = (score: number) => {
   return 'text-emerald-600';
 };
 
-export default function ControlLapsDetection() {
+export default function ControlGapsDetection() {
   const [selectedViolation, setSelectedViolation] = useState<ControlViolation | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
@@ -274,7 +274,7 @@ export default function ControlLapsDetection() {
               <ShieldAlert className="text-red-600" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-800">Control Laps Detection</h2>
+              <h2 className="text-lg font-bold text-gray-800">Control Gaps Detection</h2>
               <p className="text-sm text-gray-500">Automated compliance monitoring & gap analysis</p>
             </div>
           </div>
