@@ -832,126 +832,144 @@ function DashboardView({ stats, setActiveTab }: { stats: any; setActiveTab: (tab
 
       {/* Main Content Grid - Flipkart Style */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {/* Category Spend Overview */}
+        {/* Supplier Risk Map - Prominent */}
         <div className="col-span-2 bg-white rounded-sm overflow-hidden" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.08)' }}>
-          <div className="p-4 border-b border-[#e0e0e0] flex justify-between items-center">
+          <div className="p-4 border-b border-[#e0e0e0] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#2874f0] rounded-sm flex items-center justify-center">
-                <DollarSign className="text-white" size={18} />
+              <div className="w-9 h-9 bg-gradient-to-br from-[#2874f0] to-[#ff6161] rounded-sm flex items-center justify-center">
+                <MapPin className="text-white" size={18} />
               </div>
               <div>
-                <h3 className="font-medium text-[#212121] text-sm">Spend by Category</h3>
-                <p className="text-xs text-[#878787]">FY 2024-25 procurement spend breakdown</p>
+                <h3 className="font-medium text-[#212121] text-sm">Supplier Risk Map</h3>
+                <p className="text-xs text-[#878787]">Pan-India procurement risk analysis • Real-time monitoring</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#878787]">Total: </span>
-              <span className="text-sm font-medium text-[#2874f0]">₹1,500 Cr</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 text-[10px]">
+                <div className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#22c55e]"></div>
+                  <span className="text-[#878787]">Low</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></div>
+                  <span className="text-[#878787]">Moderate</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></div>
+                  <span className="text-[#878787]">Elevated</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#f97316]"></div>
+                  <span className="text-[#878787]">High</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></div>
+                  <span className="text-[#878787]">Severe</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="p-4">
-            <div className="grid grid-cols-3 gap-3">
-              {/* Logistics & Supply Chain */}
-              <div
-                className="p-3 bg-[#f1f3f6] rounded-sm hover:shadow-md transition-all cursor-pointer border-l-4 border-[#2874f0] group"
-                onClick={() => setSelectedCategory('Logistics & Supply Chain')}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-[#212121]">Logistics & Supply Chain</p>
-                  <span className="text-[10px] text-[#388e3c] font-medium">32.3%</span>
-                </div>
-                <p className="text-xl font-medium text-[#2874f0]">₹485 Cr</p>
-                <p className="text-[10px] text-[#878787] mt-1 line-clamp-1">Transportation, Packaging, Pallets, MHEs</p>
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-[#2874f0] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>View breakdown</span>
-                  <ChevronRight size={12} />
-                </div>
+          <div className="grid grid-cols-5 gap-0">
+            {/* Map */}
+            <div className="col-span-3 p-4">
+              <div className="h-[380px]">
+                <IndiaMap
+                  stateRisks={stateRiskData}
+                  selectedState={selectedState}
+                  onStateClick={(state: any) => setSelectedState(state)}
+                />
               </div>
+            </div>
+            {/* State Details Panel */}
+            <div className="col-span-2 border-l border-[#e0e0e0] p-4 bg-[#f9fafb]">
+              {selectedState ? (
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-[#212121]">{selectedState.state}</h4>
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded-sm capitalize ${
+                      selectedState.riskLevel === 'low' ? 'bg-[#dcfce7] text-[#166534]' :
+                      selectedState.riskLevel === 'moderate' ? 'bg-[#dbeafe] text-[#1e40af]' :
+                      selectedState.riskLevel === 'elevated' ? 'bg-[#fef3c7] text-[#92400e]' :
+                      selectedState.riskLevel === 'high' ? 'bg-[#ffedd5] text-[#c2410c]' :
+                      'bg-[#fee2e2] text-[#991b1b]'
+                    }`}>{selectedState.riskLevel} Risk</span>
+                  </div>
 
-              {/* Technology (IT) */}
-              <div
-                className="p-3 bg-[#f1f3f6] rounded-sm hover:shadow-md transition-all cursor-pointer border-l-4 border-[#ff9f00] group"
-                onClick={() => setSelectedCategory('Technology (IT)')}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-[#212121]">Technology (IT)</p>
-                  <span className="text-[10px] text-[#388e3c] font-medium">18.7%</span>
-                </div>
-                <p className="text-xl font-medium text-[#ff9f00]">₹280 Cr</p>
-                <p className="text-[10px] text-[#878787] mt-1 line-clamp-1">Hardware, Peripherals, Software & SaaS</p>
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-[#ff9f00] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>View breakdown</span>
-                  <ChevronRight size={12} />
-                </div>
-              </div>
+                  {/* Risk Score */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-[#878787]">Risk Score</span>
+                      <span className="text-sm font-medium text-[#212121]">{selectedState.riskScore}/100</span>
+                    </div>
+                    <div className="h-2.5 bg-[#e0e0e0] rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${
+                          selectedState.riskScore < 30 ? 'bg-[#22c55e]' :
+                          selectedState.riskScore < 45 ? 'bg-[#3b82f6]' :
+                          selectedState.riskScore < 55 ? 'bg-[#f59e0b]' :
+                          selectedState.riskScore < 70 ? 'bg-[#f97316]' : 'bg-[#ef4444]'
+                        }`}
+                        style={{ width: `${selectedState.riskScore}%` }}
+                      ></div>
+                    </div>
+                  </div>
 
-              {/* Services */}
-              <div
-                className="p-3 bg-[#f1f3f6] rounded-sm hover:shadow-md transition-all cursor-pointer border-l-4 border-[#388e3c] group"
-                onClick={() => setSelectedCategory('Services')}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-[#212121]">Services</p>
-                  <span className="text-[10px] text-[#388e3c] font-medium">16.3%</span>
-                </div>
-                <p className="text-xl font-medium text-[#388e3c]">₹245 Cr</p>
-                <p className="text-[10px] text-[#878787] mt-1 line-clamp-1">HR, Professional, Corporate Services</p>
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-[#388e3c] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>View breakdown</span>
-                  <ChevronRight size={12} />
-                </div>
-              </div>
+                  {/* Key Metrics */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="p-3 bg-white rounded-sm border border-[#e0e0e0]">
+                      <p className="text-xs text-[#878787]">Active Suppliers</p>
+                      <p className="text-xl font-medium text-[#2874f0]">{selectedState.supplierCount}</p>
+                    </div>
+                    <div className="p-3 bg-white rounded-sm border border-[#e0e0e0]">
+                      <p className="text-xs text-[#878787]">Warehouses</p>
+                      <p className="text-xl font-medium text-[#ff9f00]">{selectedState.warehouseCount}</p>
+                    </div>
+                    <div className="col-span-2 p-3 bg-white rounded-sm border border-[#e0e0e0]">
+                      <p className="text-xs text-[#878787]">Total Procurement Spend</p>
+                      <p className="text-xl font-medium text-[#388e3c]">{formatCurrency(selectedState.spendAmount)}</p>
+                    </div>
+                  </div>
 
-              {/* Marketing & Advertising */}
-              <div
-                className="p-3 bg-[#f1f3f6] rounded-sm hover:shadow-md transition-all cursor-pointer border-l-4 border-[#ff6161] group"
-                onClick={() => setSelectedCategory('Marketing & Advertising')}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-[#212121]">Marketing & Advertising</p>
-                  <span className="text-[10px] text-[#388e3c] font-medium">13.0%</span>
+                  {/* Risk Factors */}
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-[#878787] uppercase tracking-wide mb-2">Risk Factors</p>
+                    <div className="space-y-2">
+                      {selectedState.factors.slice(0, 4).map((factor: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between p-2 bg-white rounded-sm border border-[#e0e0e0]">
+                          <span className="text-xs text-[#212121]">{factor.type}</span>
+                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded capitalize ${
+                            factor.severity === 'high' ? 'bg-[#fee2e2] text-[#991b1b]' :
+                            factor.severity === 'medium' ? 'bg-[#fef3c7] text-[#92400e]' :
+                            'bg-[#dcfce7] text-[#166534]'
+                          }`}>{factor.severity}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xl font-medium text-[#ff6161]">₹195 Cr</p>
-                <p className="text-[10px] text-[#878787] mt-1 line-clamp-1">Media Buys, Agency Fees, Production</p>
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-[#ff6161] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>View breakdown</span>
-                  <ChevronRight size={12} />
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <div className="w-16 h-16 bg-[#e8f0fe] rounded-full flex items-center justify-center mb-4">
+                    <MapPin className="text-[#2874f0]" size={28} />
+                  </div>
+                  <h4 className="font-medium text-[#212121] mb-2">Select a State</h4>
+                  <p className="text-xs text-[#878787] max-w-[200px]">Click on any state in the map to view detailed supplier risk analysis and procurement metrics</p>
+                  <div className="mt-4 p-3 bg-white rounded-sm border border-[#e0e0e0] w-full">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-[#878787]">Total States Monitored</span>
+                      <span className="text-sm font-medium text-[#2874f0]">28</span>
+                    </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-[#878787]">High Risk States</span>
+                      <span className="text-sm font-medium text-[#ef4444]">3</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-[#878787]">Total Suppliers</span>
+                      <span className="text-sm font-medium text-[#388e3c]">2,847</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Facilities & Infrastructure */}
-              <div
-                className="p-3 bg-[#f1f3f6] rounded-sm hover:shadow-md transition-all cursor-pointer border-l-4 border-[#9c27b0] group"
-                onClick={() => setSelectedCategory('Facilities & Infrastructure')}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-[#212121]">Facilities & Infrastructure</p>
-                  <span className="text-[10px] text-[#388e3c] font-medium">11.2%</span>
-                </div>
-                <p className="text-xl font-medium text-[#9c27b0]">₹168 Cr</p>
-                <p className="text-[10px] text-[#878787] mt-1 line-clamp-1">Civil Works, Racking, Automation</p>
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-[#9c27b0] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>View breakdown</span>
-                  <ChevronRight size={12} />
-                </div>
-              </div>
-
-              {/* Outsourcing */}
-              <div
-                className="p-3 bg-[#f1f3f6] rounded-sm hover:shadow-md transition-all cursor-pointer border-l-4 border-[#00bcd4] group"
-                onClick={() => setSelectedCategory('Outsourcing')}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-medium text-[#212121]">Outsourcing</p>
-                  <span className="text-[10px] text-[#388e3c] font-medium">8.5%</span>
-                </div>
-                <p className="text-xl font-medium text-[#00bcd4]">₹127 Cr</p>
-                <p className="text-[10px] text-[#878787] mt-1 line-clamp-1">Customer Experience, Seller Support</p>
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>View breakdown</span>
-                  <ChevronRight size={12} />
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -1185,207 +1203,6 @@ function DashboardView({ stats, setActiveTab }: { stats: any; setActiveTab: (tab
           </div>
         )}
 
-      </div>
-
-      {/* India Map and Use Cases - Flipkart Style */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        {/* India Risk Map - Prominent */}
-        <div className="col-span-2 bg-white rounded-sm overflow-hidden" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.08)' }}>
-          <div className="p-4 border-b border-[#e0e0e0] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-[#2874f0] rounded-sm flex items-center justify-center">
-                <MapPin className="text-white" size={18} />
-              </div>
-              <div>
-                <h3 className="font-medium text-[#212121] text-sm">Supplier Risk Map</h3>
-                <p className="text-xs text-[#878787]">Pan-India procurement risk analysis</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 text-[10px]">
-              <div className="flex items-center gap-1">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#22c55e]"></div>
-                <span className="text-[#878787]">Low</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#3b82f6]"></div>
-                <span className="text-[#878787]">Moderate</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#f59e0b]"></div>
-                <span className="text-[#878787]">Elevated</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#f97316]"></div>
-                <span className="text-[#878787]">High</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2.5 h-2.5 rounded-sm bg-[#ef4444]"></div>
-                <span className="text-[#878787]">Severe</span>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-5 gap-0">
-            {/* Map */}
-            <div className="col-span-3 p-3">
-              <div className="h-[320px]">
-                <IndiaMap
-                  stateRisks={stateRiskData}
-                  selectedState={selectedState}
-                  onStateClick={(state: any) => setSelectedState(state)}
-                />
-              </div>
-            </div>
-            {/* State Details Panel */}
-            <div className="col-span-2 border-l border-[#e0e0e0] p-4 bg-[#f9fafb]">
-              {selectedState ? (
-                <div className="h-full flex flex-col">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-medium text-[#212121]">{selectedState.state}</h4>
-                    <span className={`px-2 py-0.5 text-xs font-medium rounded-sm capitalize ${
-                      selectedState.riskLevel === 'low' ? 'bg-[#dcfce7] text-[#166534]' :
-                      selectedState.riskLevel === 'moderate' ? 'bg-[#dbeafe] text-[#1e40af]' :
-                      selectedState.riskLevel === 'elevated' ? 'bg-[#fef3c7] text-[#92400e]' :
-                      selectedState.riskLevel === 'high' ? 'bg-[#ffedd5] text-[#c2410c]' :
-                      'bg-[#fee2e2] text-[#991b1b]'
-                    }`}>{selectedState.riskLevel} Risk</span>
-                  </div>
-
-                  {/* Risk Score */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-[#878787]">Risk Score</span>
-                      <span className="text-sm font-medium text-[#212121]">{selectedState.riskScore}/100</span>
-                    </div>
-                    <div className="h-2 bg-[#e0e0e0] rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          selectedState.riskScore < 30 ? 'bg-[#22c55e]' :
-                          selectedState.riskScore < 45 ? 'bg-[#3b82f6]' :
-                          selectedState.riskScore < 55 ? 'bg-[#f59e0b]' :
-                          selectedState.riskScore < 70 ? 'bg-[#f97316]' : 'bg-[#ef4444]'
-                        }`}
-                        style={{ width: `${selectedState.riskScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {/* Key Metrics */}
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div className="p-2 bg-white rounded-sm border border-[#e0e0e0]">
-                      <p className="text-xs text-[#878787]">Suppliers</p>
-                      <p className="text-lg font-medium text-[#2874f0]">{selectedState.supplierCount}</p>
-                    </div>
-                    <div className="p-2 bg-white rounded-sm border border-[#e0e0e0]">
-                      <p className="text-xs text-[#878787]">Warehouses</p>
-                      <p className="text-lg font-medium text-[#ff9f00]">{selectedState.warehouseCount}</p>
-                    </div>
-                    <div className="col-span-2 p-2 bg-white rounded-sm border border-[#e0e0e0]">
-                      <p className="text-xs text-[#878787]">Total Spend</p>
-                      <p className="text-lg font-medium text-[#388e3c]">{formatCurrency(selectedState.spendAmount)}</p>
-                    </div>
-                  </div>
-
-                  {/* Risk Factors */}
-                  <div className="flex-1">
-                    <p className="text-xs font-medium text-[#878787] uppercase tracking-wide mb-2">Risk Factors</p>
-                    <div className="space-y-1.5">
-                      {selectedState.factors.slice(0, 3).map((factor, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 bg-white rounded-sm border border-[#e0e0e0]">
-                          <span className="text-xs text-[#212121]">{factor.type}</span>
-                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded capitalize ${
-                            factor.severity === 'high' ? 'bg-[#fee2e2] text-[#991b1b]' :
-                            factor.severity === 'medium' ? 'bg-[#fef3c7] text-[#92400e]' :
-                            'bg-[#dcfce7] text-[#166534]'
-                          }`}>{factor.severity}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Categories */}
-                  <div className="mt-3 pt-3 border-t border-[#e0e0e0]">
-                    <p className="text-[10px] text-[#878787] mb-1.5">Key Categories</p>
-                    <div className="flex flex-wrap gap-1">
-                      {selectedState.keyCategories.map((cat, idx) => (
-                        <span key={idx} className="px-2 py-0.5 text-[10px] bg-[#e8f0fe] text-[#2874f0] rounded-sm">{cat}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="h-full flex flex-col items-center justify-center text-center">
-                  <MapPin className="text-[#d1d5db] mb-2" size={32} />
-                  <p className="text-sm text-[#878787]">Click on a state</p>
-                  <p className="text-xs text-[#d1d5db]">to view details</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Access Use Cases - Compact */}
-        <div className="flex flex-col gap-3">
-          <div className="bg-white rounded-sm p-3 hover:shadow-lg transition-all cursor-pointer group" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.08)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-sm flex items-center justify-center bg-[#2874f0]">
-                <BarChart3 className="text-white" size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-[#212121] text-sm">Lifecycle Tracking</h4>
-                <p className="text-xs text-[#878787] truncate">End-to-end visibility</p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-medium text-[#2874f0]">{stats?.transactions_tracked || 50}</p>
-                <p className="text-[10px] text-[#878787]">Active</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-sm p-3 hover:shadow-lg transition-all cursor-pointer group" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.08)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-sm flex items-center justify-center bg-[#ff9f00]">
-                <Bot className="text-white" size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-[#212121] text-sm">AI Agent</h4>
-                <p className="text-xs text-[#878787] truncate">Automated procurement</p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-medium text-[#ff9f00]">80%</p>
-                <p className="text-[10px] text-[#878787]">Automation</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-sm p-3 hover:shadow-lg transition-all cursor-pointer group" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.08)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-sm flex items-center justify-center bg-[#388e3c]">
-                <Search className="text-white" size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-[#212121] text-sm">Analytics</h4>
-                <p className="text-xs text-[#878787] truncate">Spend insights</p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-medium text-[#388e3c]">{formatCurrency(stats?.total_spend || 125000000)}</p>
-                <p className="text-[10px] text-[#878787]">Analyzed</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-sm p-3 hover:shadow-lg transition-all cursor-pointer group" style={{ boxShadow: '0 1px 8px rgba(0,0,0,0.08)' }}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-sm flex items-center justify-center bg-[#ff6161]">
-                <AlertTriangle className="text-white" size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-[#212121] text-sm">Leakage Detection</h4>
-                <p className="text-xs text-[#878787] truncate">Post-payment audit</p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-medium text-[#ff6161]">{formatCurrency(stats?.total_leakage_identified || 1850000)}</p>
-                <p className="text-[10px] text-[#878787]">Identified</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Indirect Spend Treemap */}
