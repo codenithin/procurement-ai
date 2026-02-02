@@ -1739,21 +1739,305 @@ function LifecycleView() {
 }
 
 // Use Case 2: AI Agent View
+// Intelligent parsing functions for the agent
+const parseRequirements = (text: string) => {
+  const requirements: any = {
+    category: null,
+    items: [],
+    budget: null,
+    timeline: null,
+    location: null,
+    vendors: null,
+    specifications: []
+  };
+
+  // Detect category
+  const categoryPatterns = [
+    { pattern: /office supplies|stationery|notebooks|pens|furniture/i, category: 'Office Supplies' },
+    { pattern: /IT equipment|laptop|computer|monitor|keyboard|mouse|webcam|projector/i, category: 'IT Equipment' },
+    { pattern: /software|license|SaaS|subscription|Microsoft|AWS|Jira|Figma/i, category: 'Software Licenses' },
+    { pattern: /professional services|consultant|consulting|training|staffing/i, category: 'Professional Services' },
+    { pattern: /marketing|creative|agency|campaign|social media|influencer/i, category: 'Marketing & Creative' },
+    { pattern: /logistics|warehouse|3PL|transportation|delivery|fleet/i, category: 'Logistics & Warehousing' }
+  ];
+
+  for (const { pattern, category } of categoryPatterns) {
+    if (pattern.test(text)) {
+      requirements.category = category;
+      break;
+    }
+  }
+
+  // Extract quantities (e.g., "500 units", "25 laptops", "100 licenses")
+  const quantityPattern = /(\d+)\s*(units?|pieces?|laptops?|monitors?|licenses?|sets?|pcs?)?/gi;
+  let match;
+  while ((match = quantityPattern.exec(text)) !== null) {
+    requirements.items.push({ quantity: parseInt(match[1]), unit: match[2] || 'units' });
+  }
+
+  // Extract budget (₹ or Rs. or INR)
+  const budgetPattern = /(?:₹|Rs\.?|INR)\s*([\d,]+(?:\.\d+)?)\s*(?:-|to)?\s*(?:₹|Rs\.?|INR)?\s*([\d,]+(?:\.\d+)?)?/gi;
+  const budgetMatch = budgetPattern.exec(text);
+  if (budgetMatch) {
+    const minBudget = parseInt(budgetMatch[1].replace(/,/g, ''));
+    const maxBudget = budgetMatch[2] ? parseInt(budgetMatch[2].replace(/,/g, '')) : minBudget;
+    requirements.budget = { min: minBudget, max: maxBudget };
+  }
+
+  // Extract timeline
+  const timelinePatterns = [
+    /within\s*(\d+)\s*(days?|weeks?|months?)/i,
+    /(\d+)\s*(days?|weeks?|months?)/i,
+    /delivery.*?(\d+)\s*(days?|weeks?|months?)/i
+  ];
+  for (const pattern of timelinePatterns) {
+    const timeMatch = pattern.exec(text);
+    if (timeMatch) {
+      requirements.timeline = `${timeMatch[1]} ${timeMatch[2]}`;
+      break;
+    }
+  }
+
+  // Extract location
+  const locationPattern = /(?:for|in|to|at)\s+(Bangalore|Mumbai|Delhi|Hyderabad|Chennai|Pune|Kolkata|office|warehouse)/i;
+  const locationMatch = locationPattern.exec(text);
+  if (locationMatch) {
+    requirements.location = locationMatch[1];
+  }
+
+  // Extract brand preferences
+  const brandPattern = /(?:preferred|brands?|vendor|like)\s*:?\s*([A-Za-z\s,]+?)(?:\.|,|$)/i;
+  const brandMatch = brandPattern.exec(text);
+  if (brandMatch) {
+    requirements.vendors = brandMatch[1].trim();
+  }
+
+  return requirements;
+};
+
+// Mock vendor database
+const mockVendorDatabase: Record<string, any[]> = {
+  'Office Supplies': [
+    { name: 'Staples India', score: 94, speciality: 'Bulk stationery', rating: 4.8, deliveryDays: 3, discount: '15%' },
+    { name: 'Amazon Business', score: 92, speciality: 'Wide selection', rating: 4.7, deliveryDays: 2, discount: '10%' },
+    { name: 'ITC Classmate (Direct)', score: 90, speciality: 'Premium quality', rating: 4.6, deliveryDays: 5, discount: '20%' }
+  ],
+  'IT Equipment': [
+    { name: 'Dell Direct', score: 96, speciality: 'Enterprise laptops', rating: 4.9, deliveryDays: 7, discount: '12%' },
+    { name: 'HP Business Partners', score: 94, speciality: 'Full IT solutions', rating: 4.8, deliveryDays: 10, discount: '15%' },
+    { name: 'Lenovo Enterprise', score: 93, speciality: 'ThinkPad series', rating: 4.7, deliveryDays: 8, discount: '18%' }
+  ],
+  'Software Licenses': [
+    { name: 'Microsoft CSP Partner', score: 97, speciality: 'M365 & Azure', rating: 4.9, deliveryDays: 1, discount: '8%' },
+    { name: 'SoftwareOne', score: 95, speciality: 'License optimization', rating: 4.8, deliveryDays: 1, discount: '12%' },
+    { name: 'CDW India', score: 93, speciality: 'Multi-vendor licenses', rating: 4.7, deliveryDays: 2, discount: '10%' }
+  ],
+  'Professional Services': [
+    { name: 'Deloitte', score: 96, speciality: 'Digital transformation', rating: 4.9, deliveryDays: 14, discount: '5%' },
+    { name: 'Infosys Consulting', score: 94, speciality: 'IT consulting', rating: 4.8, deliveryDays: 10, discount: '8%' },
+    { name: 'Wipro', score: 92, speciality: 'End-to-end services', rating: 4.6, deliveryDays: 12, discount: '10%' }
+  ],
+  'Marketing & Creative': [
+    { name: 'Ogilvy India', score: 95, speciality: 'Brand campaigns', rating: 4.8, deliveryDays: 21, discount: '5%' },
+    { name: 'Dentsu Webchutney', score: 94, speciality: 'Digital & social', rating: 4.9, deliveryDays: 14, discount: '8%' },
+    { name: 'WATConsult', score: 91, speciality: 'E-commerce focus', rating: 4.6, deliveryDays: 10, discount: '12%' }
+  ],
+  'Logistics & Warehousing': [
+    { name: 'Delhivery', score: 95, speciality: 'Last-mile delivery', rating: 4.8, deliveryDays: 30, discount: '10%' },
+    { name: 'Blue Dart (DHL)', score: 94, speciality: 'Express logistics', rating: 4.7, deliveryDays: 21, discount: '8%' },
+    { name: 'Mahindra Logistics', score: 92, speciality: '3PL & warehousing', rating: 4.6, deliveryDays: 45, discount: '15%' }
+  ]
+};
+
 function AgentView() {
-  const [messages, setMessages] = useState<{role: string; content: string}[]>([
-    { role: 'assistant', content: 'Hello! I\'m your AI Procurement Assistant. I can help you with transactional and tactical procurement needs. What would you like to procure today?' }
+  const [messages, setMessages] = useState<{role: string; content: string; type?: string; data?: any}[]>([
+    { role: 'assistant', content: 'Hello! I\'m your AI Procurement Assistant. I can help you with transactional and tactical procurement needs. What would you like to procure today?', type: 'greeting' }
   ]);
   const [input, setInput] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [suggestedVendors, setSuggestedVendors] = useState<any[]>([]);
   const [rfqReady, setRfqReady] = useState(false);
+  const [extractedRequirements, setExtractedRequirements] = useState<any>(null);
+  const [conversationState, setConversationState] = useState<'initial' | 'analyzing' | 'vendors' | 'rfq' | 'complete'>('initial');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const generateIntelligentResponse = (userInput: string): { content: string; type: string; data?: any } => {
+    const requirements = parseRequirements(userInput);
+    const lowerInput = userInput.toLowerCase();
+
+    // Check if this is a detailed request (from template or manual)
+    const isDetailedRequest = requirements.budget || requirements.items.length > 2 || requirements.timeline;
+
+    // Handle "yes" responses for RFQ generation
+    if ((lowerInput === 'yes' || lowerInput.includes('generate rfq') || lowerInput.includes('proceed')) && conversationState === 'vendors') {
+      setConversationState('rfq');
+      const rfqNumber = `RFQ-${Date.now().toString(36).toUpperCase()}`;
+      return {
+        type: 'rfq',
+        content: `📄 **RFQ Generated Successfully!**
+
+**RFQ Number:** ${rfqNumber}
+**Category:** ${extractedRequirements?.category || 'General Procurement'}
+**Created:** ${new Date().toLocaleDateString()}
+**Response Deadline:** ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+
+**Actions Completed:**
+✅ RFQ document created with all specifications
+✅ Sent to ${suggestedVendors.length} shortlisted vendors
+✅ Automated follow-up reminders scheduled
+✅ Bid comparison template prepared
+
+**Next Steps:**
+1. Vendors will respond within 5-7 business days
+2. I'll notify you as bids come in
+3. Automated bid comparison will be generated
+4. You can review and select the winning bid
+
+Would you like me to set up any specific evaluation criteria or add more vendors?`,
+        data: { rfqNumber, vendors: suggestedVendors }
+      };
+    }
+
+    // Detailed request - analyze and show extracted info
+    if (isDetailedRequest && requirements.category) {
+      setExtractedRequirements(requirements);
+      setConversationState('analyzing');
+
+      const vendors = mockVendorDatabase[requirements.category] || mockVendorDatabase['Office Supplies'];
+      setSuggestedVendors(vendors);
+      setRfqReady(true);
+
+      setTimeout(() => setConversationState('vendors'), 100);
+
+      const budgetStr = requirements.budget
+        ? `₹${(requirements.budget.min / 100000).toFixed(1)}L - ₹${(requirements.budget.max / 100000).toFixed(1)}L`
+        : 'Not specified';
+
+      return {
+        type: 'analysis',
+        content: `🔍 **I've analyzed your procurement request. Here's what I found:**
+
+**Category Identified:** ${requirements.category}
+**Budget Range:** ${budgetStr}
+**Timeline:** ${requirements.timeline || 'Standard delivery'}
+**Delivery Location:** ${requirements.location || 'Not specified'}
+
+**Items Extracted:**
+${requirements.items.slice(0, 5).map((item: any, i: number) => `• ${item.quantity} ${item.unit}`).join('\n') || '• Multiple items detected'}
+
+---
+
+**🏆 Top 3 Recommended Vendors:**
+
+${vendors.map((v: any, i: number) => `**${i + 1}. ${v.name}** (Score: ${v.score}/100)
+   • Speciality: ${v.speciality}
+   • Rating: ⭐ ${v.rating}/5
+   • Typical Delivery: ${v.deliveryDays} days
+   • Volume Discount: ${v.discount}`).join('\n\n')}
+
+---
+
+**💡 AI Recommendations:**
+• Best Value: **${vendors[2]?.name}** offers highest discount at ${vendors[2]?.discount}
+• Fastest Delivery: **${vendors.sort((a: any, b: any) => a.deliveryDays - b.deliveryDays)[0]?.name}**
+• Top Rated: **${vendors.sort((a: any, b: any) => b.score - a.score)[0]?.name}**
+
+Would you like me to **generate an RFQ** and send it to these vendors? (Type 'yes' to proceed)`,
+        data: { requirements, vendors }
+      };
+    }
+
+    // Simple category request
+    if (requirements.category && !isDetailedRequest) {
+      const vendors = mockVendorDatabase[requirements.category] || [];
+      setSuggestedVendors(vendors);
+
+      return {
+        type: 'clarification',
+        content: `I can help you procure **${requirements.category}**! To provide the best vendor recommendations, I need a few more details:
+
+1. **Quantity:** How many items/units do you need?
+2. **Budget:** What's your budget range?
+3. **Timeline:** When do you need delivery?
+4. **Location:** Which office/warehouse location?
+
+Or you can use one of the **Quick Start Templates** on the right for a pre-filled request.`,
+        data: { category: requirements.category }
+      };
+    }
+
+    // Handle specific questions
+    if (lowerInput.includes('compare') || lowerInput.includes('vs')) {
+      return {
+        type: 'comparison',
+        content: `📊 I can help you compare vendors. Based on your current requirements:
+
+| Criteria | ${suggestedVendors[0]?.name || 'Vendor A'} | ${suggestedVendors[1]?.name || 'Vendor B'} | ${suggestedVendors[2]?.name || 'Vendor C'} |
+|----------|---------|---------|---------|
+| Score | ${suggestedVendors[0]?.score || 95} | ${suggestedVendors[1]?.score || 92} | ${suggestedVendors[2]?.score || 90} |
+| Delivery | ${suggestedVendors[0]?.deliveryDays || 5} days | ${suggestedVendors[1]?.deliveryDays || 7} days | ${suggestedVendors[2]?.deliveryDays || 10} days |
+| Discount | ${suggestedVendors[0]?.discount || '10%'} | ${suggestedVendors[1]?.discount || '12%'} | ${suggestedVendors[2]?.discount || '15%'} |
+
+Which factors are most important for this procurement?`
+      };
+    }
+
+    if (lowerInput.includes('status') || lowerInput.includes('track')) {
+      return {
+        type: 'status',
+        content: `📋 **Active Procurement Requests:**
+
+1. **RFQ-2024-001** - IT Equipment (25 Laptops)
+   • Status: Bids received (3/3 vendors)
+   • Next: Evaluation pending
+
+2. **RFQ-2024-002** - Office Supplies
+   • Status: Awaiting vendor response
+   • Deadline: 2 days remaining
+
+3. **PO-2024-015** - Software Licenses
+   • Status: Approved, awaiting delivery
+   • Expected: Feb 10, 2024
+
+Would you like details on any specific request?`
+      };
+    }
+
+    // Default response for unclear input
+    return {
+      type: 'help',
+      content: `I'm here to help with your procurement needs! I can assist with:
+
+📦 **Creating procurement requests** - Tell me what you need to procure
+🔍 **Vendor recommendations** - I'll find the best suppliers
+📄 **RFQ generation** - Automated quote requests
+📊 **Bid comparison** - Analyze vendor proposals
+📋 **Status tracking** - Check your active requests
+
+**Try saying:**
+• "I need to procure 50 laptops for the engineering team"
+• "Find vendors for office furniture with budget ₹5L"
+• "Compare quotes for software licenses"
+
+Or click a **Quick Start Template** on the right to begin!`
+    };
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
+
+    // Show typing indicator
+    setMessages(prev => [...prev, { role: 'assistant', content: '...', type: 'typing' }]);
 
     try {
       const res = await fetch(`${API_BASE}/agent/chat`, {
@@ -1761,30 +2045,31 @@ function AgentView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           session_id: sessionId,
-          message: input,
+          message: currentInput,
           user_id: 'demo_user'
         })
       });
       const data = await res.json();
 
       setSessionId(data.session_id);
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      // Remove typing indicator and add response
+      setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: data.response }]);
 
       if (data.suggested_vendors) {
         setSuggestedVendors(data.suggested_vendors);
       }
       setRfqReady(data.rfq_ready);
     } catch {
-      // Mock response
-      const mockResponses = [
-        'I can help with that. What quantity do you need?',
-        'Got it. What\'s your budget for this procurement?',
-        'Perfect! Based on your requirements, I\'ve identified 3 preferred vendors. Shall I generate an RFQ?'
-      ];
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: mockResponses[Math.floor(Math.random() * mockResponses.length)]
-      }]);
+      // Use intelligent mock response
+      setTimeout(() => {
+        const response = generateIntelligentResponse(currentInput);
+        setMessages(prev => [...prev.slice(0, -1), {
+          role: 'assistant',
+          content: response.content,
+          type: response.type,
+          data: response.data
+        }]);
+      }, 800); // Simulate thinking time
     }
   };
 
@@ -1801,24 +2086,49 @@ function AgentView() {
       <div className="grid grid-cols-3 gap-6 h-[calc(100%-100px)]">
         {/* Chat Interface */}
         <div className="col-span-2 card flex flex-col">
-          <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+          <div className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2">
             {messages.map((msg, idx) => (
-              <div key={idx} className={`chat-message ${msg.role}`}>
-                {msg.content}
+              <div
+                key={idx}
+                className={`${
+                  msg.role === 'user'
+                    ? 'ml-auto bg-[#2874f0] text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%]'
+                    : msg.type === 'typing'
+                    ? 'bg-gray-100 text-gray-500 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%] animate-pulse'
+                    : 'bg-gray-100 text-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]'
+                }`}
+              >
+                {msg.type === 'typing' ? (
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                ) : (
+                  <div
+                    className={`text-sm whitespace-pre-wrap ${msg.role === 'assistant' ? 'prose prose-sm max-w-none' : ''}`}
+                    dangerouslySetInnerHTML={{
+                      __html: msg.content
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n/g, '<br/>')
+                    }}
+                  />
+                )}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 border-t pt-4">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-              placeholder="Type your procurement request..."
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Type your procurement request... (e.g., 'I need 25 laptops for new hires')"
+              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2874f0] focus:border-transparent bg-gray-50"
             />
-            <button onClick={sendMessage} className="btn-primary flex items-center gap-2">
-              <Send size={16} /> Send
+            <button onClick={sendMessage} className="px-6 py-3 bg-[#ff9f00] hover:bg-[#e68f00] text-white font-medium rounded-xl flex items-center gap-2 transition-colors">
+              <Send size={18} /> Send
             </button>
           </div>
         </div>
