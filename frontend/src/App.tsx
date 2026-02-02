@@ -1827,15 +1827,129 @@ function AgentView() {
         <div className="space-y-4">
           {/* Quick Actions */}
           <div className="card">
-            <h3 className="font-semibold mb-3">Quick Start Templates</h3>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Zap size={16} className="text-[#ff9f00]" />
+              Quick Start Templates
+            </h3>
             <div className="space-y-2">
-              {['Office Supplies', 'IT Equipment', 'Software Licenses', 'Professional Services'].map(template => (
+              {[
+                {
+                  name: 'Office Supplies',
+                  icon: '📦',
+                  color: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+                  iconBg: 'bg-blue-100',
+                  description: 'Stationery, furniture, cleaning',
+                  prompt: `I need to procure office supplies for our Bangalore office. Requirements:
+- 500 units of notebooks and notepads
+- 200 pens, markers, and highlighters sets
+- 50 desk organizers
+- 100 file folders and binders
+- Preferred brands: Classmate, Camlin, or equivalent quality
+- Budget range: ₹50,000 - ₹75,000
+- Delivery needed within 2 weeks
+- Please suggest approved vendors and generate an RFQ.`
+                },
+                {
+                  name: 'IT Equipment',
+                  icon: '💻',
+                  color: 'bg-purple-50 hover:bg-purple-100 border-purple-200',
+                  iconBg: 'bg-purple-100',
+                  description: 'Laptops, monitors, peripherals',
+                  prompt: `I need to procure IT equipment for new hires. Requirements:
+- 25 laptops (Dell/HP/Lenovo, i5 processor, 16GB RAM, 512GB SSD)
+- 25 monitors (24-inch, Full HD)
+- 25 keyboard and mouse combos
+- 10 webcams for video conferencing
+- 5 portable projectors for meeting rooms
+- Budget range: ₹25,00,000 - ₹30,00,000
+- Need 3-year warranty and on-site support
+- Delivery in 3 weeks to multiple office locations
+- Please compare vendors and provide best value options.`
+                },
+                {
+                  name: 'Software Licenses',
+                  icon: '🔐',
+                  color: 'bg-green-50 hover:bg-green-100 border-green-200',
+                  iconBg: 'bg-green-100',
+                  description: 'SaaS, enterprise software',
+                  prompt: `I need to procure software licenses for the engineering team. Requirements:
+- 100 licenses for Microsoft 365 Business Premium
+- 50 licenses for JetBrains All Products Pack
+- 25 licenses for Figma Professional
+- 10 licenses for Jira & Confluence (Atlassian)
+- 5 licenses for AWS professional support
+- Contract term: Annual subscription
+- Budget range: ₹50,00,000 - ₹60,00,000
+- Need volume discount pricing
+- Please check existing contracts for renewal vs new purchase options.`
+                },
+                {
+                  name: 'Professional Services',
+                  icon: '👔',
+                  color: 'bg-amber-50 hover:bg-amber-100 border-amber-200',
+                  iconBg: 'bg-amber-100',
+                  description: 'Consulting, staffing, training',
+                  prompt: `I need to procure professional services for a digital transformation project. Requirements:
+- 5 Senior Consultants (Cloud/DevOps expertise) for 6 months
+- 3 Business Analysts for process documentation
+- 2 Change Management specialists
+- Training program for 200 employees on new systems
+- Project duration: 6 months
+- Budget range: ₹1,50,00,000 - ₹2,00,00,000
+- Preferred vendors: Big 4 or specialized IT consultancies
+- Need detailed SOW and milestone-based payment terms
+- Please identify qualified vendors and request proposals.`
+                },
+                {
+                  name: 'Marketing & Creative',
+                  icon: '🎨',
+                  color: 'bg-pink-50 hover:bg-pink-100 border-pink-200',
+                  iconBg: 'bg-pink-100',
+                  description: 'Agencies, campaigns, content',
+                  prompt: `I need to procure marketing services for upcoming product launch. Requirements:
+- Creative agency for brand campaign (TV, digital, print)
+- Social media management for 6 months
+- Influencer marketing campaign (50 influencers)
+- Event management for launch event (500 attendees)
+- Production of 10 video assets
+- Budget range: ₹75,00,000 - ₹1,00,00,000
+- Campaign timeline: 3 months
+- Need agencies with e-commerce/retail experience
+- Please shortlist agencies and request creative pitches.`
+                },
+                {
+                  name: 'Logistics & Warehousing',
+                  icon: '🚚',
+                  color: 'bg-cyan-50 hover:bg-cyan-100 border-cyan-200',
+                  iconBg: 'bg-cyan-100',
+                  description: '3PL, transportation, storage',
+                  prompt: `I need to procure logistics services for expanding warehouse operations. Requirements:
+- 3PL partner for 50,000 sq ft warehouse in Hyderabad
+- Last-mile delivery coverage for 15 new cities
+- Fleet of 20 temperature-controlled vehicles
+- Warehouse management system integration
+- Contract term: 2 years with annual review
+- Expected volume: 1,00,000 orders/month
+- Budget range: ₹2,00,00,000 - ₹2,50,00,000 annually
+- SLA requirements: 99.5% on-time delivery
+- Please evaluate logistics partners and request detailed proposals.`
+                }
+              ].map(template => (
                 <button
-                  key={template}
-                  onClick={() => setInput(`I need to procure ${template.toLowerCase()}`)}
-                  className="w-full text-left px-3 py-2 bg-gray-50 rounded hover:bg-gray-100 text-sm"
+                  key={template.name}
+                  onClick={() => setInput(template.prompt)}
+                  className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${template.color}`}
                 >
-                  {template}
+                  <div className="flex items-center gap-3">
+                    <span className={`text-lg w-8 h-8 ${template.iconBg} rounded-lg flex items-center justify-center`}>
+                      {template.icon}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm text-gray-800">{template.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{template.description}</p>
+                    </div>
+                    <ChevronRight size={14} className="text-gray-400" />
+                  </div>
                 </button>
               ))}
             </div>
